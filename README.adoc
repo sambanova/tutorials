@@ -1,1 +1,38 @@
 = SambaNova tutorials
+
+This repository contains SambaNova tutorials that help you to learn more about the SambaNova platform. Each tutorial includes instructions for preparing the dataset, the code to run the model, and pointers to code discussions in our public documentation.  
+
+Start with the "Hello, World" tutorial, which uses a very simple model and the MNIST dataset. You follow some basic steps to run this ML models on the SambaNova platform.
+
+The LeNet tutorial has instructions for a full ML workflow:
+
+. Compile the model for SambaNova processors (RDU)
+. Train the model using a publicly available dataset
+. Save intermediate checkpoints and continue training from a checkpoint
+. Run inference using one of the checkpoints and generate a predictions file
+. Visualize predictions using Jupyter
+
+== How to use SambaNova tutorials
+
+. Clone this repository
++
+[source,console]
+----
+$ git clone https://github.com/sambanova/tutorials.git
+----
+
+. Enter one of the tutorials directory
++
+[source,console]
+----
+$ cd tutorials
+$ cd hello_world
+----
+
+. Follow the instructions in the README file.
+
+== Feedback
+
+Please provide your feedback at docs@sambanova.ai.
+
+

@@ -1,0 +1,273 @@
+= Hello SambaFlow! Compile and run a model
+
+:internal: true
+:source-highlighter: rouge
+:imagesdir: ../images
+
+////
+This is how we should bracket internal-only parts
+
+ifeval::[{internal} == true]
+
+endif::[]
+
+////
+
+Welcome! In this tutorial, you learn how to compile and run a `logreg.py` example model. We use a classic machine learning problem of recognizing hand-written digits.
+
+In this tutorial you:
+
+. Ensure that your environment is ready to compile and run models. 
+. Compile the model to run on the RDU architecture. Compilation generates a PEF file. 
+. Do a training run of the model, passing in the generated PEF file. 
+
+NOTE: We discuss the code for this model in https://docs.sambanova.ai/developer/latest/intro-tutorial.html[Learn about model creation with SambaFlow].
+
+== Prepare your environment
+
+To prepare your environment, you ensure that the SambaFlow package is installed.
+
+=== Check your SambaFlow installation
+
+You must have the `sambaflow` package installed to run this example and any of the tutorial examples.
+
+. To check if the package is installed, run this command:
+* For Ubuntu Linux
++
+[source,console,subs="verbatim,quotes"]
+----
+$ dpkg -s sambaflow
+----
+* For Red Hat Enterprise Linux
++
+[source,console,subs="quotes"]
+----
+$ rpm -qi sambaflow
+----
+. Examine the output and verify that the SambaFlow version that you are running matches the documentation you are using. 
+. If you see a message that `sambaflow` is not installed, contact your system administrator.
+
+=== Download the model code
+
+IMPORTANT: The tutorials in this doc set use different code than tutorials included in `/opt/sambaflow/apps`. Tutorial examples have been updated and streamlined. 
+
+.logreg model code for download
+[%collapsible]
+====
+[source,python]
+----
+include::example$logreg.py[]
+----
+====
+
+SambaNova recommends that you create your own directory inside your home directory for the tutorial code: 
+
+. Log in to your SambaNova environment. 
+. Create a directory for the tutorials, and a subdirectory for lenet. 
++
+[source,console,subs="quotes"]
+----
+$ mkdir $HOME/tutorials
+$ mkdir $HOME/tutorials/logreg
+----
++
+. Copy the `logreg.py` file that you just downloaded into `$HOME/tutorials/logreg`.
+
+
+== Compile and run your first model
+
+This Hello World! example uses the classic machine learning problem of recognizing the hand-written digits in the MNIST dataset. 
+
+
+=== Look at supported options
+
+Each example and each model has its own set of supported options.
+
+To see all arguments for the `logreg` model, change to the directory you created earlier and look at the `--help` output: 
+
+[source,console,subs="quotes"]
+----
+$ cd $HOME/tutorials/logreg
+$ python logreg.py --help
+----
+
+The output looks similar to the following: 
+
+[source,console,subs="quotes"]
+----
+usage: logreg.py [-h] {compile,run,test,measure-performance} ...
+
+positional arguments:
+  {compile,run,test,measure-performance}
+                        different modes of operation
+
+optional arguments:
+  -h, --help            show this help message and exit
+----
+
+The output shows that you can compile and run this model. 
+
+NOTE: The `test` and `measure-performance` options are primarily used internally or when working with SambaNova Support. 
+
+You can drill down and run each command with `--help` to see options at that level. For example, run the following command to see options for `run`:
+[source,console,subs="quotes"]
+----
+$ python logreg.py run --help
+----
+
+NOTE: In most cases, using the defaults for the optional arguments is best. In <<Useful arguments for logreg.py>> we list a few commonly used arguments. 
+
+
+=== Prepare data
+
+This tutorial downloads train and test datasets from the internet, so there's no separate step for preparing data.
+
+If your system does not have access to the internet, you have to download the data to a system that has access and make the files available. See <<Download model data (Optional)>>.
+
+=== Compile logreg
+ 
+When you compile the model, the compiler generates a PEF file that is suitable for running on the RDU architecture. You later pass in that file when you do a training run.  
+
+. Start in the `tutorials/logreg` directory that you created in <<Download the model code>>.
++
+[source,console,subs="quotes"]
+----
+$ cd $HOME/tutorials/logreg
+----
+. Run the compilation step, passing in the name of the PEF file to be generated. You will later pass in that file when you do a training run. 
++
+[source,console,subs="quotes"]
+----
+$ python logreg.py compile --pef-name="logreg"
+----
++
+. The compiler runs the model and displays progress messages and warnings on screen.
+
+* You can safely ignore all `info` and `warning` messages. 
+* If a message says `warning samba` it might indicate a problem with your code.
+* For some background, see https://docs.sambanova.ai/developer/latest/messages-logs.html[SambaNova messages and logs]. 
++ 
+. When the command returns to the prompt, look for this output, shown toward the end:
+
+* `Compilation succeeded for partition_X_X` shows you that compilation succeeded.
+* `Logs are generated in ...` shows where the log files are located.
+. Verify that the PEF file was generated: 
++
+[source,console,subs="quotes"]
+----
+$ ls -lh ./out/logreg/logreg.pef
+----
++
+The generated PEF file contains all information that the system needs to do a training run of the model. 
+
+=== Start a logreg training run
+
+When you do a training run, the application uploads the PEF file onto the chip and trains the model with the specified dataset. This example uses the MNIST dataset. The example code downloads the data set automatically. 
+
+NOTE: If your system is disconnected from the Internet you have to manually download the dataset to a system with Internet access and copy the dataset to the system you are running the models on. See <<Download model data (Optional)>>.
+
+//RK>>asking Pavel whether we want to recommend Torchvision or the other download site. 
+
+. Start a training run of the model with the PEF file that you generated. 
+Use `-e` to specify the number of epochs (default is 1).
++
+[source,console,subs="quotes"]
+----
+$ python $HOME/sambaflow-apps/starters/logreg/logreg.py run --num-epochs 2 --pef=out/logreg/logreg.pef
+----
++
+Even one epoch would be enough to train this simple model, but we use `--num-epochs` to see if loss decreases in the second run. The run command: 
+
+* Downloads the model data. 
+* Returns output that includes the following:
++
+----
+2023-01-25T15:14:06 : [INFO][LIB][1421606]: sn_create_session: PEF File: out/logreg/logreg.pef
+Log ID initialized to: [snuser1][python][1421606] at /var/log/sambaflow/runtime/sn.log
+Epoch [1/2], Step [10000/60000], Loss: 0.4634
+Epoch [1/2], Step [20000/60000], Loss: 0.4085
+Epoch [1/2], Step [30000/60000], Loss: 0.3860
+Epoch [1/2], Step [40000/60000], Loss: 0.3702
+Epoch [1/2], Step [50000/60000], Loss: 0.3633
+Epoch [1/2], Step [60000/60000], Loss: 0.3555
+Test Accuracy: 91.54  Loss: 0.3012
+Epoch [2/2], Step [10000/60000], Loss: 0.2861
+Epoch [2/2], Step [20000/60000], Loss: 0.3065
+Epoch [2/2], Step [30000/60000], Loss: 0.3080
+Epoch [2/2], Step [40000/60000], Loss: 0.3084
+Epoch [2/2], Step [50000/60000], Loss: 0.3076
+Epoch [2/2], Step [60000/60000], Loss: 0.3061
+Test Accuracy: 91.54  Loss: 0.3001
+----
+
+Congratulations! You have run your first model on the SambaNova system! The output shows  that the training run is successful and has a very low loss percentage, which decreases over time.
+
+
+== Useful arguments for logreg.py
+
+Each of the example model commands has several arguments. In most cases, the default gives good results. 
+
+=== Arguments for compile
+
+For a list of `compile` arguments for use with `logreg.py`, run this command:
+
+[source,console,subs="quotes"]
+----
+$ python $HOME/tutorials/logreg/logreg.py compile --help
+----
+
+The command returns a full list of arguments. Here are some useful arguments:
+
+* `--pef-name` -- Name of the output file, which has the information for running the model on RDU. 
+* `--n-chips`, `--num-tiles` -- Number of chips you want to use (from 1 to 8) and the number of tiles on the chip (1, 2, or 4). Default is 1 chip (4 tiles).
+* `--num-features` -- Number of input features (for this model the default is 784)
+* `--num-classes` -- Number of output labels (for this model the default is 10)
+
+=== Arguments for run
+
+For a list of `run` arguments for use with `logreg.py`, run this command:
+
+[source,console,subs="quotes"]
+----
+$ python $HOME/tutorials/logreg/logreg.py run --help
+----
+
+The command returns a full list of arguments. Here are some important arguments:
+
+* `-p PEF` The only required argument. A PEF file that was the output from a compile. 
+
+* `-b BATCH_SIZE, --batch-size BATCH_SIZE` -- How many samples to put in one batch. 
+//RK>>Integer between 
+* `-e`, `--num-epochs` -- How many epochs to run with the model.
+* `--num-features`, `--num-classes` -- Input features and output classes for the model.
+* `--lr` -- Learning rate parameter. Decimal fraction between 0 and 1.
+
+////
+RK>>probably need a separate section for this. 
+* `--inference` -- If you want to run inference instead of training on the model. To use this argument you have to compile the model with this argument as well.
+////
+
+== Learn more!
+
+* To understand what the messages to stdout mean, see https://docs.sambanova.ai/developer/latest/messages-logs.html[SambaNova messages and logs].
+* To learn how to run models inside a Python virtual environment, see https://docs.sambanova.ai/developer/latest/using-venvs.html[].
+
+=== Download model data (Optional) 
+
+NOTE: Only users without internet access perform this task. By default, the application code downloads model data. 
+
+If you run the example on a system that is not connected to the internet, you have to download the model data from a connected system and copy the data to the system where you want to run the model.
+
+. On a connected system run:
++
+[source,console,subs="quotes"]
+----
+$ mkdir -p /tmp/data/MNIST/raw
+$ cd /tmp/data/MNIST/raw
+$ wget http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
+$ wget http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
+$ wget http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
+$ wget http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
+----
+. Copy the four `.gz` files to the DataScale system and place them in the directory `/tmp/data/MNIST/raw`.
+. When you later use the `compile` and the `run` command, add the `--data-folder=/tmp/data` argument.

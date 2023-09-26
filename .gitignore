@@ -1,0 +1,4 @@
+*.bak
+*.bkp
+*.drawio
+__pycache__

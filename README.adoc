@@ -1,6 +1,6 @@
 = SambaNova tutorials
 
-This repository contains SambaNova tutorials that help you to learn more about the SambaNova platform. Each tutorial includes instructions for preparing the dataset, the code to run the model, and pointers to code discussions in our public documentation.  
+This repository contains SambaNova tutorials that help you to learn more about the SambaNova platform. Each tutorial includes instructions for preparing the dataset, the code to run the model, and pointers to code discussions in our public documentation.
 
 Start with the "Hello, World" tutorial, which uses a very simple model and the MNIST dataset. You follow some basic steps to run this ML models on the SambaNova platform.
 
@@ -26,7 +26,10 @@ $ git clone https://github.com/sambanova/tutorials.git
 [source,console]
 ----
 $ cd tutorials
+# Start with the 'Hello world'
 $ cd hello_world
+# Or choose the intermediate tutorial that uses LeNet
+$ cd lenet
 ----
 
 . Follow the instructions in the README file.

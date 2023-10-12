@@ -1,7 +1,7 @@
 = Compilation, training, and inference
 :imagesdir: ./images
 
-This tutorial takes you a few steps beyond our https://docs.sambanova.ai/developer/latest/getting-started.html[Hello SambaFlow!] tutorial: You also learn about dataset preparation, testing (validation), and inference. 
+This tutorial takes you a few steps beyond our https://docs.sambanova.ai/developer/latest/getting-started.html[Hello SambaFlow!] tutorial: You also learn about dataset preparation, testing (validation), and inference.
 The result is a complete end-to-end machine learning workflow:
 
 . Check the SambaFlow installation.
@@ -16,11 +16,11 @@ NOTE: We discuss the code for this model in link:https://docs.sambanova.ai/devel
 
 == Prepare your environment
 
-To prepare your environment, you: 
+To prepare your environment, you:
 
 * Check your SambaFlow installation.
 * Download the tutorial files from this document.
-* Download the data files from the internet. 
+* Download the data files from the internet.
 
 === Check your SambaFlow installation
 
@@ -39,77 +39,19 @@ $ dpkg -s sambaflow
 ----
 $ rpm -qi sambaflow
 ----
-. Examine the output and verify that the SambaFlow version that you are running matches the documentation you are using. 
+. Examine the output and verify that the SambaFlow version that you are running matches the documentation you are using.
 . If you see a message that `sambaflow` is not installed, contact your system administrator.
 
 === Download the model code
 
-IMPORTANT: The tutorials in this doc set use different code than tutorials included in `/opt/sambaflow/apps`. Tutorial examples have been updated and streamlined. 
+IMPORTANT: The tutorials in this doc set use different code than tutorials included in `/opt/sambaflow/apps`. Tutorial examples have been updated and streamlined.
 
-For this tutorial, you download several files. 
-
-==== Model code
-
-.lenet model code for download
-[%collapsible]
-====
-[source,python]
-----
-include::example$lenet.py[]
-----
-====
-
-==== Utility file
-
-The Python source for lenet model includes `mnist_utils.py`, which includes:
-
-* A `CustomMNIST` class that you will use to create a dataset from Fashion MNIST.
-* A `write_labels()` function for writing labels (you'll use it to store predictions -- the labels will be `Positive` and `Negative`).
-
-.mnist_utils.py for download
-[%collapsible]
-====
-[source,python]
-----
-include::example$mnist_utils.py[]
-----
-====
-
-==== Jupyter notebook file for inference verification
-
-For the inference step, we'll use a Jupyter notebook file. 
-
-.lenet_inference.ipynb for download
-[%collapsible]
-====
-[source,python]
-----
-include::example$lenet_inference.ipynb[]
-----
-====
-
-
-
-SambaNova recommends that you create your own directory inside your home directory for the tutorial code: 
-
-. Log in to your SambaNova environment. 
-. Create a directory for the tutorials, and a subdirectory for lenet. 
-+
-[source,console,subs="quotes"]
-----
-$ mkdir $HOME/tutorials
-$ mkdir $HOME/tutorials/lenet
-----
-+
-. Copy the files that you just downloaded into `$HOME/tutorials/lenet`.
-
-
-
+If you cloned this repository from GitHub then the code for this model should be in the `tutorials/lenet` directory.
 
 === Prepare the dataset
 
 This tutorial uses the Fashion MNIST dataset (images of items of clothing) available on https://github.com/zalandoresearch/fashion-mnist.
-Fashion MNIST is a drop-in replacement for the classic MNIST dataset (images of handwritten digits): 
+Fashion MNIST is a drop-in replacement for the classic MNIST dataset (images of handwritten digits):
 
 * 60,000 images in the training set
 * 10,000 images in the test set.
@@ -146,10 +88,10 @@ $ gunzip *gz
 
 == Compile the model
 
-Before you can train a model to run on RDU, you have to compile for training. 
+Before you can train a model to run on RDU, you have to compile it for training.
 
 Each model's code contains a compilation function.
-You call the function as `+python <model.py> compile <compile_args>+`. See link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[the Compiler Reference] for some background on compiler arguments. 
+You call the function as `+python <model.py> compile <compile_args>+`. See link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[the Compiler Reference] for some background on compiler arguments.
 
 === How to compile the model
 
@@ -159,7 +101,7 @@ You call the function as `+python <model.py> compile <compile_args>+`. See link:
 ----
 $ cd ~/tutorials/lenet
 ----
-+ 
++
 . Compile the model
 +
 [source,console]
@@ -181,9 +123,9 @@ IMPORTANT: You'll need the PEF file that the compiler generates to run training,
 
 Before calling the `compile` command have a look at available compilation arguments.
 
-* All models support the shared arguments that documented in link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[the Compiler Reference]. 
+* All models support the shared arguments that documented in link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[the Compiler Reference].
 * All models support an additional set of experimental shared arguments, usually used with working with SambaNova Support. To include these arguments in the help output, run `<model_name>.py compile --debug --help`.
-* Each model has an additional set of model-specific arguments. Those arguments are different for different models. 
+* Each model has an additional set of model-specific arguments. Those arguments are different for different models.
 
 To get a list of possible arguments call:
 
@@ -194,7 +136,7 @@ $ python lenet.py compile --help
 
 If you run the `compile` command without parameters, the compiler uses a set of reasonable defaults.
 
-link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[The compiler reference document] discusses arguments used by all models. Here's a list of other arguments: 
+link:https://docs.sambanova.ai/developer/latest/compiler-reference.html[The compiler reference document] discusses arguments used by all models. Here's a list of other arguments:
 
 `--num-classes`. Defines the number of classes used for classification.
 In this example you use the MNIST dataset to recognize handwritten digits from 0 to 9,
@@ -214,7 +156,7 @@ Inside that directory the compilation script creates a separate directory for ea
 
 == Train the model
 
-SambaFlow supports a `run` command for training, testing, and inference. 
+SambaFlow supports a `run` command for training, testing, and inference.
 
 === Common arguments to run
 
@@ -227,7 +169,7 @@ $ python lenet.py run --help
 
 Many run arguments are predefined by SambaFlow, but most models also define model-specific arguments. The most important arguments for this tutorial are:
 
-* `--pef`. Full path for a PEF file that was generated by the compiler. Copy-paste the filename from the last line of the compilation output.
+* `--pef`. Full or relative path for the PEF file that was generated by the compiler. Copy-paste the filename from the last line of the compilation output.
 
 * `--data-dir`. Data directory. In this tutorial, the directory to which you downloaded the MNIST dataset.
 
@@ -240,7 +182,7 @@ Many run arguments are predefined by SambaFlow, but most models also define mode
 
 . Start a training run for one epoch using:
 * The dataset you downloaded before.
-* The PEF file you generated in the compilation step. 
+* The PEF file you generated in the compilation step.
 +
 
 [source,console]
@@ -248,12 +190,12 @@ Many run arguments are predefined by SambaFlow, but most models also define mode
 $ export DATADIR=$HOME/datasets
 $ python lenet.py run \
     --batch-size 32 \
-    -p out/lenet-b32//lenet-b32.pef \
+    --pef out/lenet-b32/lenet-b32.pef \
     --data-dir $DATADIR \
     --ckpt-dir checkpoints
----- 
+----
 +
-. With this model and dataset, training should not take more than a minute. On stdout, you see a training log, which includes accuracy and loss. Here's an example, abbreviated in the middle. 
+. With this model and dataset, training should not take more than a minute. On stdout, you see a training log, which includes accuracy and loss. Here's an example, abbreviated in the middle.
 +
 [source,none]
 ----
@@ -283,24 +225,24 @@ $ ls  ./checkpoints/
 
 === Train for two and more epochs using the checkpoint
 
-You can continue training from the checkpoint that was saved 
+You can continue training from the checkpoint that was saved
 during the first training run.
 For more complex models, multiple training runs are helpful. If you train for several epochs and each epoch takes significant time (hours or days):
 
 . Stop training after several epochs.
-. Start training again the next day from the last saved checkpoint. 
+. Start training again the next day from the last saved checkpoint.
 
 Using checkpoints is also helpful when you experience an interrupt in the training run for some reason (e.g. hardware or software failure)--just start training from the last checkpoint!
 
-To start training from a saved checkpoint, specify the checkpoint file with the `--init-ckpt-path` argument and specify the total number of epochs to train for with `--num-epochs`. In this example we train for two total epochs. The checkpoint was saved after one epoch, so this second training run will be for one more epoch. 
+To start training from a saved checkpoint, specify the checkpoint file with the `--init-ckpt-path` argument and specify the total number of epochs to train for with `--num-epochs`. In this example we train for two total epochs. The checkpoint was saved after one epoch, so this second training run will be for one more epoch.
 
-. For the second training run, run this command: 
+. For the second training run, run this command:
 +
 [source,console]
 ----
 $ python lenet.py run \
     --batch-size 32 \
-    -p out/lenet-b32/lenet-b32.pef \
+    --pef out/lenet-b32/lenet-b32.pef \
     --data-dir $DATADIR \
     --ckpt-dir checkpoints \
     --init-ckpt-path checkpoints/1875.pt \
@@ -309,7 +251,7 @@ $ python lenet.py run \
 +
 This time the training run started from 1875 steps and reached 3750 steps.
 +
-. Examine the output, which shows that the loss goes down and the accuracy increases a bit. Here's an example, abbreviated in the middle. 
+. Examine the output, which shows that the loss goes down and the accuracy increases a bit. Here's an example, abbreviated in the middle.
 +
 [source,none]
 ----
@@ -344,7 +286,7 @@ $ ls checkpoints/
 ----
 $ python lenet.py run \
     --batch-size 32 \
-    -p out/lenet-b32/lenet-b32.pef \
+    --pef out/lenet-b32/lenet-b32.pef \
     --data-dir $DATADIR \
     --ckpt-dir checkpoints \
     --init-ckpt-path checkpoints/3750.pt \
@@ -365,12 +307,12 @@ After you trained the model for several epochs, you can test its accuracy.
 ----
 $ python lenet.py run --test \
     --batch-size 32 \
-    -p out/lenet-b32/lenet-b32.pef \
+    --pef out/lenet-b32/lenet-b32.pef \
     --data-dir $DATADIR \
     --init-ckpt-path checkpoints/1875.pt
 ----
 +
-. Verify that your output looks like this (your exact numbers might be different): 
+. Verify that your output looks like this (your exact numbers might be different):
 +
 [source,none]
 ----
@@ -383,9 +325,9 @@ If the accuracy is still steadily increasing and the loss is decreasing, then ru
 
 == Run and verify inference
 
-When you are satisfied with the accuracy you can use the model for inference. Inference means that you use a file with the same data format but without labels. The inference run adds the labels. 
+When you are satisfied with the accuracy you can use the model for inference. Inference means that you use a file with the same data format but without labels. The inference run adds the labels.
 
-NOTE: For large models, the workflow includes a separate compilation step for inference. For simple models, that step isn't necessary. We can use the PEF file we generated during the initial compilation. 
+NOTE: For large models, the workflow includes a separate compilation step for inference. For simple models, that step isn't necessary. We can use the PEF file we generated during the initial compilation.
 
 === Run inference
 
@@ -398,13 +340,13 @@ To run inference:
 $ cp $DATADIR/t10k-images-idx3-ubyte $DATADIR/inference-images-idx3-ubyte
 ----
 +
-. Run inference for this new dataset. You pass in both the PEF and the checkpoint file. 
+. Run inference for this new dataset. You pass in both the PEF and the checkpoint file.
 +
 [source,console]
 ----
 $ python lenet.py run --inference \
     --batch-size 32 \
-    -p out/lenet-b32/lenet-b32.pef \
+    --pef out/lenet-b32/lenet-b32.pef \
     --data-dir $DATADIR \
     --dataset-name inference \
     --results-dir ./results \
@@ -435,11 +377,11 @@ To check predictions, it's easiest to look at the images that were used for infe
 +
 [source,console]
 ----
-$ cd ~/sambanova-tutorials/lenet
+$ cd ~/tutorials/lenet
 $ nohup jupyter-notebook --ip=0.0.0.0 --no-browser &
 ----
 +
-. Enter the Jupyter URL in a browser that has access to the RDU host.
+. Enter the Jupyter Notebook URL in a browser that has access to the RDU host. You may need to enter the token produced by the command above.
 You will see a list of files including `visualize_predictions.ipynb`.
 . Open `visualize_predictions.ipynb`. You should see something like this.
 +

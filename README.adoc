@@ -4,13 +4,22 @@ This repository contains SambaNova tutorials that help you to learn more about t
 
 Start with the "Hello, World" tutorial, which uses a very simple model and the MNIST dataset. You follow some basic steps to run this ML models on the SambaNova platform.
 
-The LeNet tutorial has instructions for a full ML workflow:
+Use the LeNet tutorial to experience a full ML workflow:
 
 . Compile the model for SambaNova processors (RDU)
 . Train the model using a publicly available dataset
 . Save intermediate checkpoints and continue training from a checkpoint
 . Run inference using one of the checkpoints and generate a predictions file
 . Visualize predictions using Jupyter
+
+Go through the `generative_nlp` tutorial to work with a Hugging Face model in the SambaNova environment. 
+
+. Download a GPT-2 model (we've chosen a simple model to speed up compilation and fine tuning).
+. Download and prepare a dataset. 
+. Compile the model. 
+. Fine tune the compiled model using the labeled dataset. 
+. Perform inference with the unlabeled dataset to verify that training worked. 
+
 
 == How to use SambaNova tutorials
 
@@ -21,7 +30,7 @@ The LeNet tutorial has instructions for a full ML workflow:
 $ git clone https://github.com/sambanova/tutorials.git
 ----
 
-. Enter one of the tutorials directory
+. Enter one of the directories, e.g. `hello_world`:
 +
 [source,console]
 ----

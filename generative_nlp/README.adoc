@@ -1,17 +1,17 @@
 = Compile, train, and perform inference with a Hugging Face GPT model
 
-:imagesdir: ./images
-
+:imagesdir: ../images
 
 This tutorial shows how you can work with a pretrained GPT-2 model from Hugging Face.
 
-NOTE: We are using a small model because the main goal of the tutorial is
+NOTE: We are using a small model because the main goal of the tutorial is 
 to come up to speed quickly. Smaller models have shorter compile, train, and inference times.
+You can follow the same process with larger NLP models.
 
-Like all pretrained models, this model already knows things that it learned
+Like all pretrained models, this model already knows things that it learned 
 by training on a large dataset or from human input.
-The pretrained weights capture general patterns and knowledge from
-the training data, making the model capable of performing certain tasks
+The pretrained weights capture general patterns and knowledge from 
+the training data, making the model capable of performing certain tasks 
 without starting from scratch.
 For example, this model knows how to understand English.
 
@@ -21,36 +21,40 @@ You can learn about the tutorial on these pages:
 
 * This page, included as a README in the GitHub repo and as a file in the doc set,
 explains how to compile, train, and perform inference on RDU.
-** First you compile for training. Compilation generates a PEF file to pass
+** First you compile for training. Compilation generates a PEF file to pass 
 to the training run.
-** Next you do a training run. As part of the training run, you generate checkpoints
+** Next you do a training run. As part of the training run, you generate checkpoints 
 that you can use use for inference.
 ** Finally, you do an inference run using `generative_inference.py`. The inference run
 performs sentiment analysis on new data, and you can examine how well the model worked
-* Two other doc pages explain the code.
-** The https://docs.sambanova.ai/developer/latest/hf-model-code.html[Code elements of the training program] page examines the code that supports compiling
+* Two other doc pages explain the code. 
+** The https://docs.sambanova.ai/developer/latest/hf-model-code.html[] page examines the code that supports compiling 
 and training a model for RDU.
-As part of training, you can generate checkpoints.
-** The https://docs.sambanova.ai/developer/latest/hf-model-inference.html[Code elements of the inference program] page explains compiling for inference
+As part of training, you can generate checkpoints. 
+** The https://docs.sambanova.ai/developer/latest/hf-model-inference.html[] page explains compiling for inference 
 and performing an inference run.
 
-NOTE: This tutorial uses a GPT-2 Hugging Face model because the model is small
-and compile and training times are short as a result.
-You can follow the same process with larger NLP models.
 
 == Prepare your environment
 
 To prepare your environment, you:
 
+* Check your Python version
 * Check your SambaFlow installation.
 * Download the tutorial files from GitHub.
 * Download the data files from the internet.
 * Prepare the dataset for training.
 
 
+=== Check your Python version
+
+Running the tutorial requires Python 3.9 or later. 
+
+NOTE: SambaNova host systems run an earlier version of Python with this version of SambaFlow, so you have to either run the tutorial locally, or install Python 3.9 for the user who runs the tutorial. 
+
 === Check your SambaFlow installation
 
-You must have the `sambaflow` package installed to run this example and any of
+You must have the `sambaflow` package installed to run this example and any of 
 the tutorial examples.
 
 NOTE: This tutorial requires Sambaflow 1.17 or later.
@@ -68,7 +72,7 @@ $ dpkg -s sambaflow
 ----
 $ rpm -qi sambaflow
 ----
-. Examine the output and verify that the SambaFlow version that you are running
+. Examine the output and verify that the SambaFlow version that you are running 
 matches the documentation you are using.
 . If you see a message that `sambaflow` is not installed, contact your system administrator.
 
@@ -77,10 +81,8 @@ matches the documentation you are using.
 
 Before you start, clone the link:https://github.com/sambanova/tutorials[SambaNova/tutorials] GitHub repository, as instructed in the link:https://github.com/sambanova/tutorials/blob/main/README.adoc[README].
 
-The following command-line examples assume that you cloned the repository into your home directory.
+The following command-line examples assume that you cloned the repository into your home directory:
 
-. Use the `git clone` command:
-+
 [source,console,subs="quotes"]
 ----
 $ cd $HOME
@@ -92,19 +94,19 @@ NOTE: After a SambaFlow upgrade, you might have to clone the repository again if
 
 The generative_nlp tutorial includes the following folders and files:
 
-* At the top level, you see this README and the following files:
-** `generative_train.py` is the Python code for training the model, which is discussed in https://docs.sambanova.ai/developer/latest/hf-model-code.html[Code elements of the training program].
-** `generative_inference.py` is the Python code for running inference on the trained mode. Discussed in https://docs.sambanova.ai/developer/latest/hf-model-inference.html[Code elements of the inference program].
-//release.list and requirements.txt not needed if full SambaFlow installed
+* At the top level, you see the README and the following files:
+** `generative_train.py` is the Python code for training the model, which is discussed in https://docs.sambanova.ai/developer/latest/hf-model-code.html[].
+** `generative_inference.py` is the Python code for running inference on the trained mode. Discussed in https://docs.sambanova.ai/developer/latest/hf-model-inference.html[].
+//release.list and requirements.txt not needed if full SambaFlow installed 
 * The `configuration` folder includes files to support training and inference.
 ** `gpt2_small_config.json` has some configuration information. The file overrides certain Hugging Face settings to improve performance on RDU.
 You pass the file to a compilation command with the `--config-name` argument.
-** `gpt2_patch.py` has some Python code that is currently needed to run a Hugging Face model on RDU. NOTE: This patch code will no longer be needed in a future release.
-* The `utils` folder includes some utility code:
-** `datasets.py` has the code for generating datasets. and has two main APIs: `PretrainingGenerativeDataset` is for training jobs and `GenerativeDataset` is for inference jobs.
-** `checkpoint_utils.py` includes `save_checkpoint` and `load_checkpoint` functions that are used by the training and inference code.
+** `gpt2_patch.py` has some Python code that is currently needed to run a Hugging Face model on RDU. NOTE: This patch code will no longer be needed in a future release. 
+* The `utils` folder includes some utility code: 
+** `datasets.py` has the code for generating datasets. and has two main APIs: `PretrainingGenerativeDataset` is for training jobs and `GenerativeDataset` is for inference jobs. 
+** `checkpoint_utils.py` includes `save_checkpoint` and `load_checkpoint` functions that are used by the training and inference code. 
 ////
-** `globals.py` sets some token types
+** `globals.py` sets some token types 
 From Jonathan Li in Slack: globals.py is used to define some hard-coded IDs for calculating weights of different tokens during training. The same variables are set in our the generative_data_prep repo
 ////
 
@@ -113,28 +115,149 @@ From Jonathan Li in Slack: globals.py is used to define some hard-coded IDs for 
 === Download the dataset
 
 In this tutorial you use the Stanford Sentiment Treebank dataset to fine-tune the pretrained GPT-2 model.
-The dataset (English only) consists of movie evaluations and labels that indicate if the evaluation is positive or negative.
+The dataset (English only) consists of movie evaluations and labels that indicate if the evaluation is positive or negative. Here's the description from link:https://huggingface.co/datasets/sst2[Hugging Face]: 
 
-[quote,Hugging Face, https://huggingface.co/datasets/sst2]
+[quote]
 ____
 The Stanford Sentiment Treebank is a corpus with fully labeled parse trees that allows for a complete analysis of the compositional effects of sentiment in language. The corpus is based on the dataset introduced by Pang and Lee (2005) and consists of 11,855 single sentences extracted from movie reviews. It was parsed with the Stanford parser and includes a total of 215,154 unique phrases from those parse trees, each annotated by 3 human judges.
 ____
 
 Using sentiment analysis for this tutorial makes it easy to evaluate inference later.
 
-Download the dataset from the Hugging Face website, following the
-link:https://huggingface.co/datasets/sst2[instructions].
+To prepare the dataset, follow these steps:
+
+. To begin, you must ensure that the Hugging Face `datasets` package is installed in your Python environment: 
++ 
+`pip install datasets`
+. Use the following sample code to download the SST2 dataset using Hugging Face's `Dataset.load_dataset()` functionality.  The code will then preprocess the data into JSONL format for use in the next section of data preparation.
+
+[[sst2_load]]
+.sst2_load
+[%collapsible]
+====
+[source,python,options="nowrap"]
+----
+import json
+import os
+import datasets
+
+
+def preprocess_dataset_to_list(dataset) -> list[dict]:
+    """
+    Process HF SST2 Dataset object into standard Python list of dictionaries:
+
+    datapoint = [{"prompt":generate_prompt, "completion":generate_completion}, ...]
+    new_dataset = [datapoint1, datapoint2, ...]
+    """
+    new_dataset = []
+
+    for index in range(len(dataset)):
+        new_datapoint: dict = {"prompt": None, "completion": None}
+
+        text: str = dataset[index]["sentence"]
+        label: int = dataset[index]["label"]
+
+        generate_prompt = f"SENTIMENT ANALYSIS: {text} QUESTION: Is this sentence positive or negative?\n\n"
+
+        generate_completion = None
+
+        if label == 0:
+            generate_completion = "negative"
+        elif label == 1:
+            generate_completion = "positive"
+
+        new_datapoint["prompt"] = generate_prompt
+        new_datapoint["completion"] = generate_completion
+
+        new_dataset.append(new_datapoint)
+
+    return new_dataset
+
+
+def save_list_to_jsonl(dataset_list, file_name: str) -> None:
+    """
+    Save preprocessed HF SST2 dataset as JSONL for consumption in SN generative data prep.
+    """
+    assert "jsonl" in file_name, "File extension is not jsonl"
+
+    if os.path.isfile(file_name):
+        print(f"{file_name} already exists")
+        return
+
+    print(f"Writing {file_name}...")
+
+    with open(file_name, "w") as writer:
+        for item in dataset_list:
+            json.dump(item, writer)
+            writer.write("\n")
+
+
+if __name__ == "__main__":
+    # Load Dataset
+    sst2 = datasets.load_dataset(
+        "sst2",
+    )
+
+    # Split DatasetDict into base Datasets
+    train_dataset = sst2["train"]
+    valid_dataset = sst2["validation"]
+    test_dataset = sst2["test"]
+
+    # Preprocess
+    preprocessed_train_dataset = preprocess_dataset_to_list(train_dataset)
+    preprocessed_valid_dataset = preprocess_dataset_to_list(valid_dataset)
+    preprocessed_test_dataset = preprocess_dataset_to_list(test_dataset)
+
+    # Write
+    save_list_to_jsonl(preprocessed_train_dataset, "preprocessed_train_dataset.jsonl")
+    save_list_to_jsonl(preprocessed_valid_dataset, "preprocessed_valid_dataset.jsonl")
+    save_list_to_jsonl(preprocessed_test_dataset, "preprocessed_test_dataset.jsonl")
+
+
+----
+====
 
 === Prepare the dataset
 
-To prepare the data, follow the instructions at
-link:https://github.com/sambanova/generative_data_prep[SambaNova Generative Dataset Preparation] on GitHub.
+Preparing the dataset consists of two steps: 
 
-As a result you get a directory with 40 files in HDF5 format.
+==== Step 1: Download the software package
+
+SambaNova has provided a software package to help prepare data for use in generative models: link:https://github.com/sambanova/generative_data_prep[SambaNova Generative Dataset Preparation].  To begin, you must install the package per these link:https://github.com/sambanova/generative_data_prep/tree/main#installation[installation instructions].  Please make note of the link:https://github.com/sambanova/generative_data_prep/tree/main#requirements[requirements].
+
+Details on how Generative Data Preparation works are available at the links above, but essentially what it does is take data in plain text or JSONL format and processes it into HDF5 files that can be consumed by generative models.  The package efficiently handles the shuffling, splitting, and tokenizing of any size of dataset.
+
+==== Step 2: Run the conversion commands
+
+To help you get started with this tutorial, here's a command for processing a JSONL file (such as that generated by <<sst2_load>>) to an HDF5 file:
+
+[[process_jsonl_hdf5]]
+.process_jsonl_hdf5
+[%collapsible]
+====
+[source,console,options="nowrap"]
+----
+#!/bin/bash
+
+DATA_PREP_PYTHONPATH=/path/to/gendataprep/package
+
+PYTHONPATH=$DATA_PREP_PYTHONPATH:$PYTHONPATH python -m generative_data_prep pipeline \
+--input_file_path=/path/to/JSONL \
+--output_path=/path/to/output/HDF5 \
+--pretrained_tokenizer=gpt2 \
+--input_packing_config=single::drop \
+--max_seq_length=1024 \
+--shuffle on_RAM \
+--dev_ratio 0.1
+
+----
+====
+
+This command generates files for train and dev splits and a log file detailing what was done to process the data.  Files associated with the tokenizer are also placed here.
 
 === Files on Hugging Face
 
-The tutorial uses a pretrained GPT-2 model from Hugging Face, available at
+The tutorial uses a pretrained GPT-2 model from Hugging Face, available at 
 https://huggingface.co/gpt2.
 
 
@@ -143,17 +266,19 @@ https://huggingface.co/gpt2.
 Training a model on a SambaNova system consists of two steps:
 
 . First, you compile the model.
-** The PyTorch model, via the SambaNova Python API, goes through the _graph compiler_
+** The PyTorch model, via the SambaNova Python API, goes through the _graph compiler_ 
 to transform the original model into a series of RDU kernel dataflow graphs.
-** The _kernel compiler_ transforms each kernel dataflow graph into a bitfile,
+** The _kernel compiler_ transforms each kernel dataflow graph into a bitfile, 
 and compiles these bitfiles together into an executable (PEF file).
 +
-See https://docs.sambanova.ai/developer/latest/compiler-overview.html[Compiler overview] for background information.
+See https://docs.sambanova.ai/developer/latest/compiler-overview.html[] for background information.
 
 . Then you use the compiled model to run training.
-You specify the PEF file generated at the compilation step, the dataset, existing
-checkpoints if you have them, and the directory to store new checkpoints.
-The checkpoints are usually saved after a number of training steps.
+You specify: 
+** The PEF file generated at the compilation step.
+** The dataset.
+** Existing checkpoints (if you have any).
+** The directory to store new checkpoints. The checkpoints are usually saved after a number of training steps.
 They can be used either to continue training after a pause or to run inference.
 
 // point to where we discuss checkpoints
@@ -172,6 +297,7 @@ To compile for training, run these commands:
 $ cd ~/tutorials/generative_nlp
 $ mkdir -p out
 $ export OUTPUT_FOLDER=out
+
 $ SN_NUM_THREADS=32 python3 generative_train.py compile \
 --max_seq_length 1024 \
 --batch-size 16 \
@@ -188,35 +314,35 @@ $ SN_NUM_THREADS=32 python3 generative_train.py compile \
 
 Some of the arguments are required by the compiler:
 
-* `num-tiles`: use 4 tiles on SN30 systems (0.5 RDU) for this tutorial
-* `pef-name` specifies the name of the PEF file that the compiler will generate.
+* `num-tiles`. Use 4 tiles on SN30 systems (0.5 RDU) for this tutorial.
+* `pef-name`. Name of the PEF file that the compiler will generate.
 
 Some of the arguments are expected by the model itself (and defined inside the model's code)
 
 * `max_seq_length`. Maximum sequence length for the model. To train GPT-2 with the SST2 data, use 1024.
 * `batch-size`. Number of data samples that are processed in a single forward and backward pass.
-* `config-name`. Name of a configuration file. In this tutorial, the configuration file overwrites
+* `config-name`. Name of a configuration file. In this tutorial, the configuration file overwrites 
 the default configuration of the Hugging Face model.
-* `weight_decay`. Supports regularization by introducing a penalty to the loss function
+* `weight_decay`. Supports regularization by introducing a penalty to the loss function 
 and encouraging smaller weights in the model.
 * `max_grad_norm_clip`. Limits the gradient norm clipping.
 // See TORCH.NN.UTILS.CLIP_GRAD_NORM_ https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html for some background.
 * `model_name_or_path`. Name of the model.
 
-As compilation proceeds, you'll see detailed messages on the command line.
-You can ignore most of those messages. See https://docs.sambanova.ai/developer/latest/messages-logs.html[SambaNova messages and logs] for some background.
+As compilation proceeds, you'll see detailed messages on the command line. 
+You can ignore most of those messages. See https://docs.sambanova.ai/developer/latest/messages-logs.html[] for some background. 
 
-At the and of compilation, you should see a message that a PEF file was generated.
+At the end of compilation, you should see a message that a PEF file was generated. 
 
 === Train the model
 
 Before you run training with this model, you need:
 
 * A dataset that's compatible with the model.
-* A configuration file that amends the Hugging Face model configuration to optimize it
+* A configuration file that amends the Hugging Face model configuration to optimize it 
 for RDU.
 * The model Python code, `generative_train.py` in this tutorial.
-You use the same `generative_train.py` file for compilation and training.
+You use the same `generative_train.py` file for compilation and training. 
 You will later use a different file to run inference.
 
 SambaFlow has a `run` command that supports both training runs and inference runs.
@@ -226,10 +352,18 @@ SambaFlow has a `run` command that supports both training runs and inference run
 
 Run the following command to start the training session:
 
+First, set the variables. Don't copy these commands, the values depend on your environment: 
+
 [source,console,subs="verbatim,quotes"]
 ----
-$ export PEF=train/train.pef
-$ export DATADIR=$HOME/datasets/sst2
+$ export PEF=<path/to/pef>
+$ export DATADIR=<path/to/dataset>
+----
+
+Run the training script:
+
+[source,console,subs="verbatim,quotes"]
+----
 $ SAMBA_SEED=256 python3 generative_train.py run \
 --max_seq_length 1024 \
 --batch-size 16 \
@@ -246,24 +380,24 @@ $ SAMBA_SEED=256 python3 generative_train.py run \
 ----
 
 
-Most of the arguments are set to the same value during compilation and training.
+Most of the arguments are set to the same value during compilation and training. 
 The following arguments are required or expected during training:
 
 * `pef`: The `pef` argument is required for training. It specifies a PEF file,
- which was the output of compilation.
+ which was the output of compilation. 
 
 Certain arguments are expected by this GPT-2 model (and defined in the model's code). Many of these arguments are used by most models.
 
 * `data_dir`. Location of the dataset. Some pre-processing is usually necessary.
 * `checkpoint_name`. If you restart training from a checkpoint, name of the checkpoint.
-** Each training run saves a checkpoint file that's named after
+** Each training run saves a checkpoint file that's named after 
 the number of steps (e.g. `800.pt`)
-** To failure proof your training run, run in batches and pass in a checkpoint
+** To failure proof your training run, run in batches and pass in a checkpoint 
 to refine your model.
 * `steps`. Number of steps to run. Each step is a complete iteration through forward, backward, and optimization.
-* `min_eval_acc`. Argument to use during a test run. During a test run, you pass in
-the trained model and a dataset that includes labels. Your code can then check
-if the outputs map to the expected outputs and ensure that this model
+* `min_eval_acc`. Argument to use during a test run. During a test run, you pass in 
+the trained model and a dataset that includes labels. Your code can then check 
+if the outputs map to the expected outputs and ensure that this model 
 meets this minimum evaluation accuracy.
 
 ////
@@ -274,7 +408,7 @@ Analyze / optimize hyperparameters
 
 == Inference
 
-The inference step consists of two steps, compilation for inference and the actual inference run.
+The inference step consists of two steps, compilation for inference and the actual inference run. 
 
 === Compile for inference
 
@@ -303,17 +437,17 @@ $ SN_NUM_THREADS=32 python3 generative_inference.py compile \
 The arguments are almost the same as for compilation for training, with the following differences:
 
 * `--inference`. Perform an inference run.
-* `--o0`. Use the o0 compiler optimization level.
-See https://docs.sambanova.ai/developer/latest/compiler-reference.html[Compiler reference] for some background.
+* `--o0`. Use the o0 compiler optimization level. 
+See https://docs.sambanova.ai/developer/latest/compiler-reference.html[] for some background. 
 
 At the end of the compilation output you will see the PEF file name that you should use at the next step.
 If you didn't change the arguments, the file name will be `inference/inference.pef`.
 
 === Run inference
 
-When you run inference, you use pass in a checkpoint from your training run and a dataset
+When you run inference, you use pass in a checkpoint from your training run and a dataset 
 that your model hasn't seen before.
-Just as for training, you specify that dataset with `data_dir` but point to the validation dataset (not the training dataset).
+Just as for training, you specify that dataset with `data_dir` but point to the validation dataset (not the training dataset). 
 
 Run the following command:
 

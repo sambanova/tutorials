@@ -489,8 +489,6 @@ def main():
                                 lr=0.0) if not args.inference else None
     if args.command == "compile":
         pef_metadata=get_pefmeta(args, model)
-        pef_metadata['sambaflow_version'] = sambaflow_version
-        pef_metadata['input_shapes'] = (inputs[0].shape, inputs[1].shape)
         samba.session.compile(model,
                               inputs,
                               optimizer,
